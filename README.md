@@ -9,7 +9,12 @@ This is for personal interest, you are welcom to use the material but keep in mi
 It is also really appreciated if you could point out anything wrong or provide any suggestions on improvement of my answer.
 
 Contents:
-Tensorflow
+tfwarmup: Tensorflow practice
+In this folder I implemented three different algorithms for language model: VanillaRNN/LSTM/GRU, to get myself familiar with tensorflow.
+The dataset is from @dennybritz's rnn tutorial: https://github.com/dennybritz/rnn-tutorial-rnnlm. 
+He's also got this very helpful blog http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/, pretty inspirational, thanks a lot!
+
+Ongoing:
 Word2Vec, CBOW, GloVe
 RNN, LSTM, GRU
 Dependency Parser, TreeRNN
