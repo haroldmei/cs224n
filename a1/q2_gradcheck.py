@@ -40,10 +40,12 @@ def gradcheck_naive(f, x):
         # Use assignment will make a reference to x itself, we just want to make a copy of it
         xprime1 = x.copy()
         xprime1[ix] = x[ix] - h
+        random.setstate(rndstate)
         fxprime1, _ = f(xprime1)
 
         xprime2 = x.copy()
         xprime2[ix] = x[ix] + h
+        random.setstate(rndstate)
         fxprime2, _ = f(xprime2)
 
         numgrad = (fxprime2 - fxprime1) / (h * 2.0)
