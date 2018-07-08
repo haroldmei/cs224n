@@ -111,12 +111,18 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     ukv = np.dot(outputVectors[indices[1:]], predicted)  # exclude the target
     sigmoid_ukv = sigmoid(-ukv)  # 1 x K
     cost = -np.log(sigmoid_uov) - np.sum(np.log(sigmoid_ukv))
-    gradTheta1 = (1/sigmoid_uov)*sigmoid_uov*(1-sigmoid_uov)    # a scalar
-    gradTheta2 = (1/sigmoid_ukv)*(-sigmoid_ukv)*(1-sigmoid_ukv) # K x 1 array
-    gradPred = -gradTheta1 * outputVectors[target] - np.sum(outputVectors[indices[1:]] * np.reshape(gradTheta2,(-1,1)), axis = 0)  # 1 x D array
+    gradTheta1 = -(1/sigmoid_uov) * sigmoid_uov * (1 - sigmoid_uov)    # a scalar
+    gradTheta2 = (1/sigmoid_ukv) * sigmoid_ukv * (1 - sigmoid_ukv) # K x 1 array
+    gradPred = gradTheta1 * outputVectors[target] + np.sum(outputVectors[indices[1:]] * np.reshape(gradTheta2,(-1,1)), axis = 0)  # 1 x D array
     gradOutput = np.zeros([V,D])
-    # only K none-zero rows indicates the K negative samples
-    gradOutput[indices[1:]] = np.reshape(gradTheta2, (-1, 1)) * predicted
+    
+    # only K none-zero rows indicates the K negative samples, same numble of samples but might contain duplicated words
+    # Can be parallelized further.
+    samples = np.reshape(gradTheta2, (-1, 1)) * predicted
+    for i in range(V):
+        gradOutput[i] = np.sum(samples[np.where(np.array(indices[1:]) == i)], axis=0)
+    # the positive sample
+    gradOutput[indices[0]] = np.reshape(gradTheta1, (-1, 1)) * predicted
     grad = gradOutput
     ### END YOUR CODE
 
