@@ -64,9 +64,11 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     y = np.zeros(V)
     y[target] = 1
     cost = -np.dot(np.log(yhat), y)
-    gradTheta = -np.dot(1/yhat, y) * yhat * (y - yhat[target])    # gradient w.r.t. softmax
-    #gradPred = np.dot(gradTheta, outputVectors)
-    gradPred = -np.dot(1/yhat, y) * yhat[target] * (outputVectors[target] - np.sum(outputVectors * np.reshape(yhat,(-1,1)), axis = 0))
+    #gradTheta = -np.dot(1/yhat, y) * yhat * (y - yhat[target])    # gradient w.r.t. softmax
+    gradTheta = -np.dot(1/yhat, y) * yhat * (y - yhat[target])
+    
+    #gradPred = -np.dot(1/yhat, y) * yhat[target] * (outputVectors[target] - np.sum(outputVectors * np.reshape(yhat,(-1,1)), axis = 0))
+    gradPred = -(outputVectors[target] - np.sum(outputVectors * np.reshape(yhat,(-1,1)), axis = 0))
     grad = np.reshape(gradTheta,(-1,1)) * predicted
     ### END YOUR CODE
 
@@ -193,11 +195,13 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
 
     for word in contextWords:
         target = tokens[word]
-        c, gI, gO = word2vecCostAndGradient(
-            predicted, target, outputVectors, dataset)
-        cost = cost + c
-        gradIn[tokens[currentWord]] = gradIn[tokens[currentWord]] + gI
-        gradOut = gradOut + gO
+        for cur in indexes:
+            predicted = inputVectors[cur]
+            c, gI, gO = word2vecCostAndGradient(
+                predicted, target, outputVectors, dataset)
+            cost = cost + c
+            gradIn[cur] = gradIn[cur] + gI
+            gradOut = gradOut + gO
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
