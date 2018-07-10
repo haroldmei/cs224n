@@ -1,13 +1,20 @@
 # cs224n  
 Stanford deep nlp course  
 
-Orignial course materials are in:   
-http://web.stanford.edu/class/cs224n/  
+Python versioin: Python 3.6.4 :: Anaconda, Inc.  
+Tensorflow versioin: 1.8.0  
 
+Please install other missing libs if necessary.  
 
 Answers to CS224n problem sets, practice exams; only contains written and coding answers, original problem sets please refer to Stanford Official course site.  
 This is for personal interest, you are welcom to use the material but keep in mind this is not guaranteed to be the right answer.  
 It is also really appreciated if you could point out anything wrong or provide any suggestions on improvement of my answer.  
+
+Orignial course materials are in:   
+http://web.stanford.edu/class/cs224n/  
+
+Couse videos:  
+https://www.youtube.com/playlist?list=PL3FW7Lu3i5Jsnh1rnUwq_TcylNr7EkRe6  
 
 
 Errors in PS:  
