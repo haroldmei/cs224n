@@ -63,11 +63,8 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     yhat = softmax(np.dot(outputVectors, predicted))
     y = np.zeros(V)
     y[target] = 1
-    cost = -np.dot(np.log(yhat), y)
-    #gradTheta = -np.dot(1/yhat, y) * yhat * (y - yhat[target])    # gradient w.r.t. softmax
+    cost = -np.log(yhat)[target]
     gradTheta = -(1/yhat)[target] * yhat * (y - yhat[target])
-    
-    #gradPred = -np.dot(1/yhat, y) * yhat[target] * (outputVectors[target] - np.sum(outputVectors * np.reshape(yhat,(-1,1)), axis = 0))
     gradPred = -(outputVectors[target] - np.sum(outputVectors * np.reshape(yhat,(-1,1)), axis = 0))
     grad = np.reshape(gradTheta,(-1,1)) * predicted
     ### END YOUR CODE
@@ -107,21 +104,43 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     indices.extend(getNegativeSamples(target, dataset, K))
 
     ### YOUR CODE HERE
+    # refactorization of the first draft below.
     V,D = outputVectors.shape
-    uov = np.dot(predicted, outputVectors[target])
-    sigmoid_uov = sigmoid(uov)
-    ukv = np.dot(outputVectors[indices[1:]], predicted)  # exclude the target
-    sigmoid_ukv = sigmoid(-ukv)  # 1 x K
-    cost = -np.log(sigmoid_uov) - np.sum(np.log(sigmoid_ukv))
-    gradTheta1 = -(1 - sigmoid_uov)    # a scalar
-    gradTheta2 = (1 - sigmoid_ukv) # K x 1 array
-    gradPred = gradTheta1 * outputVectors[target] + np.sum(outputVectors[indices[1:]] * np.reshape(gradTheta2, (-1,1)), axis = 0)  # 1 x D array
-    
-    # only K none-zero rows indicates the K negative samples, same numble of samples but might contain duplicated words
-    # Can be parallelized further.
-    gradTheta2 = [np.sum(gradTheta2[np.where(np.array(indices[1:]) == i)], axis=0) for i in range(V)]
-    gradTheta2[indices[0]] = gradTheta1
-    grad = np.reshape(gradTheta2, (-1, 1)) * predicted
+    output = outputVectors[indices] # the 0th is the center
+    uv = np.dot(output, predicted)
+    uv[0] = -uv[0]
+    sig = sigmoid(-uv)
+    cost = -np.sum(np.log(sig))
+    gradTheta = 1 - sig
+    gradTheta[0] = - gradTheta[0]
+    gradPred = np.dot(output.T, gradTheta)  # 1 x D array
+
+    samples = np.reshape(gradTheta, (-1, 1)) * predicted
+    grad = np.zeros([V, D])
+    for i in range(len(indices)):
+        grad[indices[i]] += samples[i]
+
+    ########################## First draft ###########################
+    ### !!!this is super slow !!! bottle neck should be the 'for' loop
+    # uov = np.dot(predicted, outputVectors[target])
+    # sigmoid_uov = sigmoid(uov)
+    # ukv = np.dot(outputVectors[indices[1:]], predicted)  # exclude the target
+    # sigmoid_ukv = sigmoid(-ukv)  # 1 x K
+    # cost = -np.log(sigmoid_uov) - np.sum(np.log(sigmoid_ukv))
+    # gradTheta1 = -(1 - sigmoid_uov)    # a scalar
+    # gradTheta2 = (1 - sigmoid_ukv) # K x 1 array
+    # gradPred = gradTheta1 * outputVectors[target] + np.sum(outputVectors[indices[1:]] * np.reshape(gradTheta2, (-1,1)), axis = 0)  # 1 x D array
+    # gradOutput = np.zeros([V,D])
+    # 
+    # # only K none-zero rows indicates the K negative samples, same numble of samples but might contain duplicated words
+    # # Can be parallelized further.
+    # samples = np.reshape(gradTheta2, (-1, 1)) * predicted
+    # for i in range(V):
+    #     gradOutput[i] = np.sum(samples[np.where(np.array(indices[1:]) == i)], axis=0)
+    # # the positive sample
+    # gradOutput[indices[0]] = np.reshape(gradTheta1, (-1, 1)) * predicted
+    # grad = gradOutput
+    ### END YOUR CODE
 
     return cost, gradPred, grad
 
@@ -187,16 +206,24 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     ### YOUR CODE HERE
     indexes = np.array([tokens[word] for word in contextWords])
     predicted = np.sum(inputVectors[indexes], axis = 0) # vhat is a sum of neighbors
+    
+    target = tokens[currentWord]
+    cost, gradPred, gradOut = word2vecCostAndGradient(predicted, target, outputVectors, dataset)
+    gradIn = np.zeros_like(inputVectors)
+    for w in contextWords:
+        gradIn[tokens[w]] += gradPred
 
-    for word in contextWords:
-        target = tokens[word]
-        for cur in indexes:
-            predicted = inputVectors[cur]
-            c, gI, gO = word2vecCostAndGradient(
-                predicted, target, outputVectors, dataset)
-            cost = cost + c
-            gradIn[cur] = gradIn[cur] + gI
-            gradOut = gradOut + gO
+    #This looks like a combination of cbow and skipgram, but will not be able to learn 
+	#the relationship of center word and context word
+    #for word in contextWords:
+    #    target = tokens[word]
+    #    for cur in indexes:
+    #        predicted = inputVectors[cur]
+    #        c, gI, gO = word2vecCostAndGradient(
+    #            predicted, target, outputVectors, dataset)
+    #        cost = cost + c
+    #        gradIn[cur] = gradIn[cur] + gI
+    #        gradOut = gradOut + gO
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
