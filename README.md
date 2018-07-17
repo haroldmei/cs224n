@@ -34,6 +34,12 @@ Assignment 1:
 2, NN basics (forward/backward propogation, Cross Entropy, Softmax and Sigmoid)    
 3, word2vec (Cross Entropy loss, Negative sampling, Skipgram vs CBOW)    
 4, Sentiment Analysis    
+    How to make it work under windows and python 3:    
+    1), Fix the data:    
+    The dataset in stanfordSentimentTreebank contains corrupted chars and has been fixed using windows notepad.    
+    First open the text, then save as another file in 'ANSI' encoding.    
+    2), Read file in byte mode:    
+    open(filename, "rb")    
 
 
 Ongoing topics:  
