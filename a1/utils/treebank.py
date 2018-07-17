@@ -51,7 +51,7 @@ class StanfordSentiment:
             return self._sentences
 
         sentences = []
-        with open(self.path + "/datasetSentences.txt", "r") as f:
+        with open(self.path + "/datasetSentences_a.txt", "rb") as f:
             first = True
             for line in f:
                 if first:
@@ -118,16 +118,16 @@ class StanfordSentiment:
 
         dictionary = dict()
         phrases = 0
-        with open(self.path + "/dictionary.txt", "r") as f:
+        with open(self.path + "/dictionary.txt", "rb") as f:
             for line in f:
                 line = line.strip()
                 if not line: continue
-                splitted = line.split("|")
+                splitted = line.split(b"|")
                 dictionary[splitted[0].lower()] = int(splitted[1])
                 phrases += 1
 
         labels = [0.0] * phrases
-        with open(self.path + "/sentiment_labels.txt", "r") as f:
+        with open(self.path + "/sentiment_labels.txt", "rb") as f:
             first = True
             for line in f:
                 if first:
@@ -136,14 +136,14 @@ class StanfordSentiment:
 
                 line = line.strip()
                 if not line: continue
-                splitted = line.split("|")
+                splitted = line.split(b"|")
                 labels[int(splitted[0])] = float(splitted[1])
 
         sent_labels = [0.0] * self.numSentences()
         sentences = self.sentences()
         for i in range(self.numSentences()):
             sentence = sentences[i]
-            full_sent = " ".join(sentence).replace('-lrb-', '(').replace('-rrb-', ')')
+            full_sent = b" ".join(sentence).replace(b'-lrb-', b'(').replace(b'-rrb-', b')')
             sent_labels[i] = labels[dictionary[full_sent]]
 
         self._sent_labels = sent_labels
@@ -154,14 +154,14 @@ class StanfordSentiment:
             return self._split
 
         split = [[] for i in range(3)]
-        with open(self.path + "/datasetSplit.txt", "r") as f:
+        with open(self.path + "/datasetSplit.txt", "rb") as f:
             first = True
             for line in f:
                 if first:
                     first = False
                     continue
 
-                splitted = line.strip().split(",")
+                splitted = line.strip().split(b",")
                 split[int(splitted[1]) - 1] += [int(splitted[0]) - 1]
 
         self._split = split
