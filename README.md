@@ -1,6 +1,7 @@
 # cs224n  
 Stanford deep nlp course  
 
+OS: Windows 10 64bit
 Python versioin: Python 3.6.4 :: Anaconda, Inc.  
 Tensorflow versioin: 1.8.0  
 
