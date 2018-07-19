@@ -1,3 +1,26 @@
+import random
+import numpy as np
+
+""" 
+[--q2a2.a--]
+Sequence of transitions for sentence 'I parsed this sentence correctly'
+1, [ROOT]                       [I, parsed, this, sentence, correctly]      Init
+2, [ROOT, I]                    [parsed, this, sentence, correctly]         Shift
+3, [ROOT, I, parsed]            [this, sentence, correctly]                 Shift
+4, [ROOT, parsed]               [this, sentence, correctly]                 Left-Arc        parsed->I
+4, [ROOT, parsed, this]         [sentence, correctly]                       Shift
+5, [ROOT, parsed, this, sentence]   [correctly]                             Shift
+6, [ROOT, parsed, sentence]     [correctly]                                 Left-Arc        sentence->this
+7, [ROOT, parsed]               [correctly]                                 Right-Arc       parsed->sentence
+8, [ROOT, parsed, correctly]    []                                          Shift
+9, [ROOT, parsed]               []                                          Right-Arc       parsed->correctly
+10,[ROOT]                       []                                          Right-Arc       ROOT->parsed
+
+[--q2a2.b--]
+Shift n times plus Left/Right arc n times will be needed to make the buffer and stack empty.
+
+"""
+
 class PartialParse(object):
     def __init__(self, sentence):
         """Initializes this partial parse.
@@ -21,6 +44,9 @@ class PartialParse(object):
         self.sentence = sentence
 
         ### YOUR CODE HERE
+        self.stack = ['ROOT']
+        self.buffer = sentence.copy()
+        self.dependencies = []
         ### END YOUR CODE
 
     def parse_step(self, transition):
@@ -32,6 +58,22 @@ class PartialParse(object):
                         transition.
         """
         ### YOUR CODE HERE
+        if transition == 'S':
+            curr = self.buffer[0]
+            self.stack.append(curr)
+            self.buffer.remove(curr)
+
+        elif transition == 'LA':
+            dependent = self.stack.pop(len(self.stack) - 2)
+            self.dependencies.append((self.stack[len(self.stack) - 1], dependent))
+
+        elif transition == 'RA':
+            dependent = self.stack.pop()
+            self.dependencies.append((self.stack[len(self.stack) - 1], dependent))
+
+        else:
+            assert("Not possible!")
+            
         ### END YOUR CODE
 
     def parse(self, transitions):
@@ -66,6 +108,21 @@ def minibatch_parse(sentences, model, batch_size):
     """
 
     ### YOUR CODE HERE
+    partial_parses = np.array([PartialParse(s) for s in sentences])
+    unfinished_parses = np.array(list(range(len(sentences))))
+    dependencies = [None] * len(sentences)
+    while len(unfinished_parses) > 0:
+        lenunfinish = len(unfinished_parses)        # number of unfinished sentenses
+        indexes = random.sample(list(range(lenunfinish)), min(lenunfinish, batch_size)) # sample a batch
+        indexes = np.array(list(set(indexes)))      # no dup
+        sindex = unfinished_parses[indexes]         # map to sentence index
+        transitions = model.predict(partial_parses[sindex]) # apply model to get transitions
+        for ii in range(len(indexes)):
+            i = indexes[ii]     # why do we need this index mapping?
+            dependencies[unfinished_parses[i]] = partial_parses[unfinished_parses[i]].parse([transitions[ii]])
+            if len(partial_parses[unfinished_parses[i]].stack) == 1 and len(partial_parses[unfinished_parses[i]].buffer) == 0:
+                unfinished_parses = np.delete(unfinished_parses, i)
+                break   # just for simplicity temporarily, is to be optimized
     ### END YOUR CODE
 
     return dependencies
@@ -85,7 +142,7 @@ def test_step(name, transition, stack, buf, deps,
         "{:} test resulted in buffer {:}, expected {:}".format(name, buf, ex_buf)
     assert deps == ex_deps, \
         "{:} test resulted in dependency list {:}, expected {:}".format(name, deps, ex_deps)
-    print "{:} test passed!".format(name)
+    print ("{:} test passed!".format(name))
 
 
 def test_parse_step():
@@ -112,7 +169,7 @@ def test_parse():
         "parse test resulted in dependencies {:}, expected {:}".format(dependencies, expected)
     assert tuple(sentence) == ("parse", "this", "sentence"), \
         "parse test failed: the input sentence should not be modified"
-    print "parse test passed!"
+    print ("parse test passed!")
 
 
 class DummyModel(object):
@@ -149,7 +206,7 @@ def test_minibatch_parse():
                       (('only', 'ROOT'), ('only', 'arcs'), ('only', 'left')))
     test_dependencies("minibatch_parse", deps[3],
                       (('again', 'ROOT'), ('again', 'arcs'), ('again', 'left'), ('again', 'only')))
-    print "minibatch_parse test passed!"
+    print ("minibatch_parse test passed!")
 
 if __name__ == '__main__':
     test_parse_step()
