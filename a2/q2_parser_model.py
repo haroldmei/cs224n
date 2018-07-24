@@ -183,15 +183,15 @@ class ParserModel(Model):
             loss = self.train_on_batch(sess, train_x, train_y)
             prog.update(i + 1, [("train loss", loss)], force=i + 1 == n_minibatches)
 
-        print ("Evaluating on dev set",
+        print ("Evaluating on dev set")
         dev_UAS, _ = parser.parse(dev_set)
-        print ("- dev UAS: {:.2f}".format(dev_UAS * 100.0)
+        print ("- dev UAS: {:.2f}".format(dev_UAS * 100.0))
         return dev_UAS
 
     def fit(self, sess, saver, parser, train_examples, dev_set):
         best_dev_UAS = 0
         for epoch in range(self.config.n_epochs):
-            print ("Epoch {:} out of {:}".format(epoch + 1, self.config.n_epochs)
+            print ("Epoch {:} out of {:}".format(epoch + 1, self.config.n_epochs))
             dev_UAS = self.run_epoch(sess, parser, train_examples, dev_set)
             if dev_UAS > best_dev_UAS:
                 best_dev_UAS = dev_UAS
@@ -216,7 +216,7 @@ def main(debug=True):
         os.makedirs('./data/weights/')
 
     with tf.Graph().as_default() as graph:
-        print ("Building model...",
+        print ("Building model...",)
         start = time.time()
         model = ParserModel(config, embeddings)
         parser.model = model
