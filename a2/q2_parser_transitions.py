@@ -58,16 +58,16 @@ class PartialParse(object):
                         transition.
         """
         ### YOUR CODE HERE
-        if transition == 'S':
+        if transition == 'S' and len(self.buffer) > 0:
             curr = self.buffer[0]
             self.stack.append(curr)
             self.buffer.remove(curr)
 
-        elif transition == 'LA':
+        elif transition == 'LA' and len(self.stack) > 1:
             dependent = self.stack.pop(len(self.stack) - 2)
             self.dependencies.append((self.stack[len(self.stack) - 1], dependent))
 
-        elif transition == 'RA':
+        elif transition == 'RA' and len(self.stack) > 1:
             dependent = self.stack.pop()
             self.dependencies.append((self.stack[len(self.stack) - 1], dependent))
 
