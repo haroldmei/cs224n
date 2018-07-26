@@ -23,7 +23,7 @@ class Config(object):
     embed_size = 50
     hidden_size = 200
     batch_size = 1024
-    n_epochs = 10
+    n_epochs = 100
     lr = 0.0005
 
 
@@ -90,10 +90,12 @@ class ParserModel(Model):
         """
         ### YOUR CODE HERE
         if labels_batch is None:
-            labels_batch = np.reshape(np.zeros(self.config.n_classes), [-1, self.config.n_classes])
-        feed_dict = {self.input_placeholder: inputs_batch,
-                     self.labels_placeholder: labels_batch,
-                     self.dropout_placeholder: dropout}
+            feed_dict = {self.input_placeholder: inputs_batch,
+                         self.dropout_placeholder: dropout}
+        else:
+            feed_dict = {self.input_placeholder: inputs_batch,
+                         self.labels_placeholder: labels_batch,
+                         self.dropout_placeholder: dropout}
         ### END YOUR CODE
         return feed_dict
 
@@ -117,12 +119,14 @@ class ParserModel(Model):
         ### YOUR CODE HERE
         n_features = self.config.n_features
         embed_size = self.config.embed_size
-        V,_ = self.pretrained_embeddings.shape
-        vocabulary = tf.get_variable('q2_vocabulary', shape=[V, embed_size],   dtype=tf.float32,
-                                     initializer=tf.constant_initializer(self.pretrained_embeddings))
         input_indices = tf.reshape(self.input_placeholder, (-1,))
-        embeddings = tf.gather(vocabulary, input_indices) #vocabulary[input_indices]
+        embeddings = tf.gather(self.pretrained_embeddings, input_indices)
         embeddings = tf.reshape(embeddings, (-1, n_features * embed_size))
+
+        #embeddings = self.pretrained_embeddings
+        #embeddings = tf.nn.embedding_lookup(embeddings, self.input_placeholder)
+        #embeddings = tf.reshape(
+        #    embeddings, (-1, self.config.n_features*self.config.embed_size))
         ### END YOUR CODE
         return embeddings
 
@@ -156,21 +160,21 @@ class ParserModel(Model):
         num_class = self.config.n_classes
 
         xavier_initializer = xavier_weight_init()
-        self.W = tf.get_variable('q2_parser_W', shape=[feature_size, hidden_size],   dtype=tf.float32,
+        self.W = tf.get_variable('q2_parser_W', shape=[feature_size, hidden_size], dtype=tf.float32,
                                  initializer=xavier_initializer)
 
-        self.b1 = tf.get_variable('q2_parser_b1', shape=[hidden_size],   dtype=tf.float32,
+        self.b1 = tf.get_variable('q2_parser_b1', shape=[hidden_size], dtype=tf.float32,
                                   initializer=xavier_initializer)
 
-        h = tf.nn.relu(tf.matmul(x, self.W))
+        self.U = tf.get_variable('q2_parser_U', shape=[hidden_size, num_class], dtype=tf.float32,
+                                 initializer=xavier_initializer)
+
+        self.b2 = tf.get_variable('q2_parser_b2', shape=[num_class], dtype=tf.float32,
+                                  initializer=xavier_initializer)
+
+        # damn, forgot the intercept part...
+        h = tf.nn.relu(tf.matmul(x, self.W) + self.b1)
         h_drop = tf.nn.dropout(h, 1 - self.config.dropout)
-
-        self.U = tf.get_variable('q2_parser_U', shape=[hidden_size, num_class],   dtype=tf.float32,
-                                 initializer=xavier_initializer)
-
-        self.b2 = tf.get_variable('q2_parser_b2', shape=[num_class],   dtype=tf.float32,
-                                  initializer=xavier_initializer)
-
         pred = tf.matmul(h_drop, self.U) + self.b2
         ### END YOUR CODE
         return pred
@@ -189,8 +193,8 @@ class ParserModel(Model):
             loss: A 0-d tensor (scalar)
         """
         ### YOUR CODE HERE
-        losses = tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=self.labels_placeholder)
-        loss = tf.reduce_mean(losses)
+        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+            labels=self.labels_placeholder, logits=pred))
         ### END YOUR CODE
         return loss
 
@@ -294,11 +298,11 @@ def main(debug=True):
             UAS, dependencies = parser.parse(test_set)
             print ("- test UAS: {:.2f}".format(UAS * 100.0))
             print ("Writing predictions")
-            with open('q2_test.predicted.pkl', 'w') as f:
-                cPickle.dump(dependencies, f, -1)
+            with open('q2_test.predicted.pkl', 'wb') as f:
+                _pickle.dump(dependencies, f, -1)
             print ("Done!")
 
 
 if __name__ == '__main__':
-    main()
+    main(False)
 

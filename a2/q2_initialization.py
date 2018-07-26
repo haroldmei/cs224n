@@ -25,8 +25,10 @@ def xavier_weight_init():
             out: tf.Tensor of specified shape sampled from the Xavier distribution.
         """
         ### YOUR CODE HERE
-        epsilon = np.sqrt(np.product(shape) / np.sum(shape))
-        out = tf.random_uniform(shape = shape, dtype = tf.float32, minval = -epsilon, maxval = epsilon)
+        #epsilon = np.sqrt(np.product(shape) / np.sum(shape))   #I have no idea why I did it like this... using this will slow down the convergence drastically!!!
+        epsilon = np.sqrt(6 / np.sum(shape))
+        out = tf.random_uniform(
+            shape=shape, dtype=tf.float32, minval=-epsilon, maxval=epsilon)
         ### END YOUR CODE
         return out
     # Returns defined initializer function.
