@@ -237,20 +237,20 @@ class WindowModel(NERModel):
         num_class = self.config.n_classes
 
         self.W = tf.get_variable('a3_q2_W', shape=[feature_size, hidden_size], dtype=tf.float32,
-                                 initializer=tf.random_uniform_initializer(-np.sqrt(1./hidden_size), np.sqrt(1./hidden_size)))
+                                 initializer=tf.contrib.layers.xavier_initializer())
 
         self.b1 = tf.get_variable('a3_q2_b1', shape=[hidden_size], dtype=tf.float32,
-                                  initializer=tf.random_uniform_initializer(-np.sqrt(1./hidden_size), np.sqrt(1./hidden_size)))
+                                  initializer=tf.contrib.layers.xavier_initializer())
 
         self.U = tf.get_variable('a3_q2_U', shape=[hidden_size, num_class], dtype=tf.float32,
-                                 initializer=tf.random_uniform_initializer(-np.sqrt(1./num_class), np.sqrt(1./num_class)))
+                                 initializer=tf.contrib.layers.xavier_initializer())
 
         self.b2 = tf.get_variable('a3_q2_b2', shape=[num_class], dtype=tf.float32,
-                                  initializer=tf.random_uniform_initializer(-np.sqrt(1./num_class), np.sqrt(1./num_class)))
+                                  initializer=tf.contrib.layers.xavier_initializer())
 
         # damn, forgot the intercept part...
         h = tf.nn.relu(tf.matmul(x, self.W) + self.b1)
-        h_drop = tf.nn.dropout(h, 1 - dropout_rate)
+        h_drop = tf.nn.dropout(h, dropout_rate)
         pred = tf.matmul(h_drop, self.U) + self.b2
         ### END YOUR CODE
         return pred
