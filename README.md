@@ -29,10 +29,10 @@ The dataset is from @dennybritz's rnn tutorial: https://github.com/dennybritz/rn
 He's also got this blog http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/, easy to understand.  
 
 ### Assignment 1:  
-#### Softmax    
-#### NN basics (forward/backward propogation, Cross Entropy, Softmax and Sigmoid)    
-#### word2vec (Cross Entropy loss, Negative sampling, Skipgram vs CBOW)    
-#### Sentiment Analysis    
+* Softmax    
+* NN basics (forward/backward propogation, Cross Entropy, Softmax and Sigmoid)    
+* word2vec (Cross Entropy loss, Negative sampling, Skipgram vs CBOW)    
+* Sentiment Analysis    
   How to make it work under windows and python 3:    
   1), Fix the data:    
   The dataset in stanfordSentimentTreebank contains corrupted chars and has been fixed using windows notepad.    
@@ -42,14 +42,14 @@ He's also got this blog http://www.wildml.com/2015/09/recurrent-neural-networks-
 
 
 ### Assignment 2:    
-#### Softmax tensorflow implement    
-#### Neural Network Transition-Based Denendency Parsing    
-#### Recurrent Neural Networks: Language Modelling    
+* Softmax tensorflow implement    
+* Neural Network Transition-Based Denendency Parsing    
+* Recurrent Neural Networks: Language Modelling    
 
 ### Assignment 3:    
-#### Windows-Based NER    
-#### RNN for NER    
-#### RNN: GRU    
+* Windows-Based NER    
+* RNN for NER    
+* RNN: GRU    
 
 ### Assignment 4:    
 
