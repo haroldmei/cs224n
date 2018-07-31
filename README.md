@@ -33,12 +33,12 @@ He's also got this blog http://www.wildml.com/2015/09/recurrent-neural-networks-
 #### NN basics (forward/backward propogation, Cross Entropy, Softmax and Sigmoid)    
 #### word2vec (Cross Entropy loss, Negative sampling, Skipgram vs CBOW)    
 #### Sentiment Analysis    
-    How to make it work under windows and python 3:    
-    1), Fix the data:    
-    The dataset in stanfordSentimentTreebank contains corrupted chars and has been fixed using windows notepad.    
-    First open the text, then save as another file in 'ANSI' encoding.    
-    2), Read file in byte mode:    
-    open(filename, "rb")    
+  How to make it work under windows and python 3:    
+  1), Fix the data:    
+  The dataset in stanfordSentimentTreebank contains corrupted chars and has been fixed using windows notepad.    
+  First open the text, then save as another file in 'ANSI' encoding.    
+  2), Read file in byte mode:    
+  open(filename, "rb")    
 
 
 ### Assignment 2:    
