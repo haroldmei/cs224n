@@ -25,8 +25,8 @@ gradcheck_naive(lambda params:
 ## Contents:  
 ### tfwarmup: Tensorflow environment preparation    
 In this folder I trained 3 language models: VanillaRNN/LSTM/GRU, to get my tensorflow work properly.  
-The dataset is from @dennybritz's rnn tutorial: https://github.com/dennybritz/rnn-tutorial-rnnlm.   
-He's also got this blog http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/, easy to understand.  
+The dataset is from [@dennybritz's rnn tutorial](https://github.com/dennybritz/rnn-tutorial-rnnlm)
+[@dennybritz's blog](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
 
 ### Assignment 1:  
 * Softmax    
