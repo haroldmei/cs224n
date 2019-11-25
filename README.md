@@ -1,10 +1,7 @@
 # cs224n Stanford deep nlp course  
 
 OS: Windows 10 64bit
-Python versioin: Python 3.6.4 :: Anaconda, Inc.  
-Tensorflow versioin: 1.8.0  
-
-Please install other missing libs if necessary.  
+Please install missing libs if necessary.   
 
 Answers to CS224n problem sets, practice exams; only contains written and coding answers, original problem sets please refer to Stanford Official course site.  
 This is for personal interest, you are welcom to use the material but keep in mind this is not guaranteed to be the right answer.  
@@ -23,10 +20,17 @@ gradcheck_naive(lambda params:
 
 
 ## Contents:  
-### tfwarmup: Tensorflow environment preparation    
-In this folder I trained 3 language models: VanillaRNN/LSTM/GRU, to get my tensorflow work properly.  
+### language_models: 
+Play with different language models using Tensorflow/PyTorch    
+Experiment on multiple language models:  
+1. VanillaRNN/LSTM, to get my tensorflow work properly.  
 The dataset is from [@dennybritz's rnn tutorial](https://github.com/dennybritz/rnn-tutorial-rnnlm)
 [@dennybritz's blog](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
+
+2. Transformer  
+Is from [The Annotated Transformer](https://nlp.seas.harvard.edu/2018/04/03/attention.html)  
+
+
 
 ### Assignment 1:  
 * Softmax    
