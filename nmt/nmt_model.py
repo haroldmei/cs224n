@@ -80,7 +80,7 @@ class NMT(nn.Module):
         self.att_projection             = nn.Linear(self.hidden_size*2, self.hidden_size, bias=False)
         self.combined_output_projection = nn.Linear(self.hidden_size*3, self.hidden_size, bias=False)
         #self.target_vocab_projection    = nn.Linear(len(self.vocab.tgt), out_features=self.hidden_size)
-        self.target_vocab_projection    = nn.Linear(self.hidden_size, len(self.vocab.tgt))
+        self.target_vocab_projection    = nn.Linear(self.hidden_size, len(self.vocab.tgt), bias=False)
         self.dropout                    = nn.Dropout(self.dropout_rate)
 
         ### END YOUR CODE
