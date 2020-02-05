@@ -40,11 +40,19 @@ def pad_sents_char(sents, char_pad_token):
     ###
     ###     You should NOT use the method `pad_sents()` below because of the way it handles
     ###     padding and unknown words.
+    def pad_word(w, max_len):
+        return w + [char_pad_token] * (max_len - len(w))
 
-
+    padded_word = [char_pad_token] * max_word_length
+    sentence_len = np.max([len(s) for s in sents])
+    for j in range(len(sents)):
+        for i in range(len(sents[j])):
+            sents[j][i] = pad_word(sents[j][i], max_word_length)
+        sents[j] = sents[j] + [padded_word] * (sentence_len - len(sents[j]))
+    
     ### END YOUR CODE
 
-    return sents_padded
+    return sents
 
 
 def pad_sents(sents, pad_token):

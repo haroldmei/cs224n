@@ -2,3 +2,6 @@
 __pycache__
 model.bin
 model.bin.optim
+vocab.json
+vocab_tiny_q1.json
+vocab_tiny_q2.json
