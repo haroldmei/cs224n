@@ -17,20 +17,29 @@ class CNN(nn.Module):
         """
         """
         ### the final word embedding size
+        super(CNN, self).__init__()
         self.kernel = kernel
         self.emb_word = emb_word
         self.emb_char = emb_char
-        self.M_WORD = 21
+        self.max_words = 21
 
         ### input output size are both embed_size
-        self.Conv1d = nn.Conv1d(self.emb_char * self.M_WORD, self.emb_word, self.emb_char * self.kernel, bias=True)
+        self.Conv1d = \
+            nn.Sequential(
+                # input: batch * emb_char * max_words
+                # output: batch * emb_word * (max_words - kernel + 1)
+                nn.Conv1d(self.emb_char, self.emb_word, self.kernel, bias=True),
+                nn.ReLU(),
+                nn.MaxPool1d(self.max_words - self.kernel + 1)
+            )
 
     def forward(self, input):
         """
         params:
-        input: a batch of words with shape (batch, embed_size)
+        input: a batch of words with shape (batch, emb_char, max_words)
+        output: (batch, emb_word)
         """
-        word_emb = self.Conv1d(input)
+        word_emb = self.Conv1d(input).squeeze(2)
         return word_emb
 
 

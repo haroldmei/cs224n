@@ -168,7 +168,7 @@ class VocabEntry(object):
         ###     previous parts
         sents = self.words2charindices(sents)
         sents = pad_sents_char(sents, self.char2id['<pad>'])
-        sents = torch.Tensor(sents)
+        sents = torch.LongTensor(sents)
 
         # (sent_len, batch, embedding)
         sents = torch.transpose(sents, 0, 1)

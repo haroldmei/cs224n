@@ -18,12 +18,19 @@ class Highway(nn.Module):
         """
         """
         ### the final word embedding size
+        super(Highway, self).__init__()
         self.embed_size = embed_size
         self.dropout_rate = dropout_rate
 
         ### input output size are both embed_size
-        self.W_proj = nn.Linear(self.embed_size, self.embed_size, bias=True)
-        self.W_gate = nn.Linear(self.embed_size, self.embed_size, bias=True)
+        self.ReLU_W_proj = nn.Sequential(
+            nn.Linear(self.embed_size, self.embed_size, bias=True),
+            nn.ReLU()
+        )
+        self.Sigmoid_W_gate = nn.Sequential(
+            nn.Linear(self.embed_size, self.embed_size, bias=True),
+            nn.Sigmoid()
+        )
         self.Dropout = nn.Dropout(self.dropout_rate)
 
     def forward(self, input):
@@ -31,8 +38,8 @@ class Highway(nn.Module):
         params:
         input: a batch of words with shape (batch, embed_size)
         """
-        xproj = nn.ReLU(self.W_proj(input))
-        xgate = nn.Sigmoid(self.W_proj(input))
+        xproj = self.ReLU_W_proj(input)
+        xgate = self.Sigmoid_W_gate(input)
         x_highway = xproj * xgate +(1 - xgate) * input
         
         return x_highway

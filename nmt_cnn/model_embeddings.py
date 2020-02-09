@@ -17,8 +17,8 @@ import torch.nn as nn
 #   `Highway` in the file `highway.py`
 # Uncomment the following two imports once you're ready to run part 1(j)
 
-# from cnn import CNN
-# from highway import Highway
+from cnn import CNN
+from highway import Highway
 
 # End "do not change" 
 
@@ -40,8 +40,24 @@ class ModelEmbeddings(nn.Module):
         ## End A4 code
 
         ### YOUR CODE HERE for part 1j
+        self.dropout_rate = 0.3
+        self.emb_char = 50
+        self.embed_size = embed_size
 
+        pad_token_idx = vocab.char2id['<pad>']
+        self.embeddings = nn.Embedding(len(vocab.char2id), self.emb_char, padding_idx=pad_token_idx)
 
+        # Conv1d + Pooling1d
+        cnn = CNN(emb_char=self.emb_char, emb_word = self.embed_size) 
+
+        # with dropout rate? 
+        highway = Highway(embed_size = self.embed_size, dropout_rate=self.dropout_rate)
+
+        # with a dropout layer?
+        dropout = nn.Dropout(self.dropout_rate)
+
+        # chain all toghether
+        self.construct_emb = nn.Sequential(cnn, highway, dropout)
         ### END YOUR CODE
 
     def forward(self, input):
@@ -60,6 +76,19 @@ class ModelEmbeddings(nn.Module):
 
         ### YOUR CODE HERE for part 1j
 
+        char_embeddings = self.embeddings(input) # sentence_length, batch_size, max_word_length,
 
+        sent_len, batch_size, max_word, _ = char_embeddings.shape
+
+        view_shape = (sent_len * batch_size, max_word, self.emb_char)
+
+        char_embeddings = char_embeddings.view(view_shape).transpose(1, 2)
+
+        emb_output = self.construct_emb(char_embeddings)
+
+        emb_output = emb_output.view(sent_len, batch_size, self.embed_size)
+
+        #print(view_shape)
+        return emb_output
         ### END YOUR CODE
 
