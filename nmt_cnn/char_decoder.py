@@ -55,7 +55,7 @@ class CharDecoder(nn.Module):
         
         s = self.char_output_projection(h)  
         
-        return s, (torch.unsqueeze(h[-1],0), c[-1]) 
+        return s, c #(torch.unsqueeze(h[-1],0), c[-1]) 
         
         ### END YOUR CODE 
 
@@ -73,12 +73,12 @@ class CharDecoder(nn.Module):
         ###
         ### Hint: - Make sure padding characters do not contribute to the cross-entropy loss.
         ###       - char_sequence corresponds to the sequence x_1 ... x_{n+1} from the handout (e.g., <START>,m,u,s,i,c,<END>).
-        s,(h,c) = self.forward(char_sequence[:-1,:], dec_hidden)
+        s,dec_hidden = self.forward(char_sequence[:-1,:], dec_hidden)
         l,b,d = s.shape
         ground_truth = char_sequence[1:,:]
         s = s.view((l*b,d))
         ground_truth = ground_truth.view((l*b))
-        loss=nn.CrossEntropyLoss(ignore_index=0)
+        loss=nn.CrossEntropyLoss(reduction= "sum",ignore_index=0)
         l = loss(s,ground_truth)
         return l
         ### END YOUR CODE
