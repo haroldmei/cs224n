@@ -27,7 +27,12 @@ class CharDecoder(nn.Module):
         ### Hint: - Use target_vocab.char2id to access the character vocabulary for the target language.
         ###       - Set the padding_idx argument of the embedding matrix.
         ###       - Create a new Embedding layer. Do not reuse embeddings created in Part 1 of this assignment.
-        
+        super(CharDecoder,self).__init__()
+        self.target_vocab = target_vocab
+        self.charDecoder = nn.LSTM(char_embedding_size, hidden_size)
+        self.char_output_projection = nn.Linear(hidden_size, len(self.target_vocab.char2id))
+        self.decoderCharEmb = nn.Embedding(len(self.target_vocab.char2id), char_embedding_size,
+                                           padding_idx=0)
 
         ### END YOUR CODE
 
@@ -44,7 +49,13 @@ class CharDecoder(nn.Module):
         """
         ### YOUR CODE HERE for part 2b
         ### TODO - Implement the forward pass of the character decoder.
+
+        input = self.decoderCharEmb(input)
+        h,c = self.charDecoder(input, dec_hidden)
         
+        s = self.char_output_projection(h)  
+        
+        return s, (torch.unsqueeze(h[-1],0), c[-1]) 
         
         ### END YOUR CODE 
 
@@ -62,8 +73,14 @@ class CharDecoder(nn.Module):
         ###
         ### Hint: - Make sure padding characters do not contribute to the cross-entropy loss.
         ###       - char_sequence corresponds to the sequence x_1 ... x_{n+1} from the handout (e.g., <START>,m,u,s,i,c,<END>).
-
-
+        s,(h,c) = self.forward(char_sequence[:-1,:], dec_hidden)
+        l,b,d = s.shape
+        ground_truth = char_sequence[1:,:]
+        s = s.view((l*b,d))
+        ground_truth = ground_truth.view((l*b))
+        loss=nn.CrossEntropyLoss(ignore_index=0)
+        l = loss(s,ground_truth)
+        return l
         ### END YOUR CODE
 
     def decode_greedy(self, initialStates, device, max_length=21):
@@ -83,7 +100,19 @@ class CharDecoder(nn.Module):
         ###      - Use torch.tensor(..., device=device) to turn a list of character indices into a tensor.
         ###      - We use curly brackets as start-of-word and end-of-word characters. That is, use the character '{' for <START> and '}' for <END>.
         ###        Their indices are self.target_vocab.start_of_word and self.target_vocab.end_of_word, respectively.
-        
-        
+        _,b,h = initialStates[0].shape
+        start_index = self.target_vocab.start_of_word
+        end_index   = self.target_vocab.end_of_word
+        h,c = initialStates[0],initialStates[1]
+        curr = torch.LongTensor([[start_index] * b])
+        words = ['']*b
+        for i in range(max_length):
+            s,(h,c) = self.forward(curr, (h,c)) 
+            curr = s.argmax(dim=2)
+            for idx in range(b):
+                words[idx] = words[idx] + self.target_vocab.id2char[curr[0][idx].item()] if curr[0][idx].item() > 3 else ''
+           
+
+        return words
         ### END YOUR CODE
 
