@@ -166,14 +166,14 @@ class VocabEntry(object):
         ### TODO: 
         ###     Connect `words2charindices()` and `pad_sents_char()` which you've defined in 
         ###     previous parts
+
         sents = self.words2charindices(sents)
         sents = pad_sents_char(sents, self.char2id['<pad>'])
         sents = torch.LongTensor(sents)
-
         # (sent_len, batch, embedding)
         sents = torch.transpose(sents, 0, 1)
-
         return sents
+
         # reshape the array
 
         ### END YOUR CODE

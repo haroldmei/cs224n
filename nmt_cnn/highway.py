@@ -14,6 +14,7 @@ class Highway(nn.Module):
     """
     Class that converts input words to their CNN-based embeddings.
     """
+
     def __init__(self, embed_size, dropout_rate=0.2):
         """
         """
@@ -21,7 +22,6 @@ class Highway(nn.Module):
         super(Highway, self).__init__()
         self.embed_size = embed_size
         self.dropout_rate = dropout_rate
-
         ### input output size are both embed_size
         self.ReLU_W_proj = nn.Sequential(
             nn.Linear(self.embed_size, self.embed_size, bias=True),
